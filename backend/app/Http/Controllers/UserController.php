@@ -32,7 +32,6 @@ class UserController extends Controller
         }catch(\Throwable|\Exception $e){
             return ResponseService::exception('users.store',null,$e);
         }
-
         return new UserResource($user,array('type' => 'store','route' => 'users.store'));
     }
 
