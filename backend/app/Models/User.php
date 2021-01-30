@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
@@ -34,12 +34,10 @@ class User extends Model
         'email_verified_at' => 'datetime',
     ];
 
-    public function create($fields)
+    public function setPasswordAttribute($value)
     {
-        return parent::create([
-            'name' => $fields['name'],
-            'email' => $fields['email'] ,
-            'password' => Hash::make($fields['password']),
-        ]);
-    }
+        $this->attributes['password'] = Hash::make($value);
+    }    
+    public $timestamps = false;
+
 }

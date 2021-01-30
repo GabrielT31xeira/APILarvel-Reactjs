@@ -2,37 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Request\User\StoreUser;
 use App\Services\ResponseService;
 use App\Transformers\User\UserResource;
 use App\Transformers\User\UserResourceCollection;
+use Illuminate\Support\Facades\Validator;
+
 
 class UserController extends Controller
 {
-    private $user;
-
-    public function __construct(User $user){
-        $this->user = $user;
-    }
-
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreUser $request)
+    public function store(Request $request)
     {
-        try{        
-            $user = $this
-            ->user
-            ->create($request->all());
-        }catch(\Throwable|\Exception $e){
-            return ResponseService::exception('users.store',null,$e);
-        }
-        return new UserResource($user,array('type' => 'store','route' => 'users.store'));
-    }
+        $validator = Validator::make($request->all(), $this->rules($request));
 
+        if ($validator->fails()) {
+            return response()->json('Deu erro meu bom', 500);
+        }
+        User::create($request->all());
+        $response = [
+            'message' => "DEubom meu bom",
+            'data'    => []
+        ];
+
+        return response()->json($response, 200);
+    }
+    private function rules(Request $request, $primaryKey = null, bool $changeMessages = false)
+    {
+        $rules = [
+            'email' => 'unique:users,email|email|required',
+            'name' => 'required',
+            'password' => 'required',
+        ];
+
+        $messages = [];
+
+        return !$changeMessages ? $rules : $messages;
+    }
 }
